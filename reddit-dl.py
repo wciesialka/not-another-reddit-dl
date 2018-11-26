@@ -2,6 +2,8 @@ import praw
 import configparser
 import requests
 import os
+import pprint
+
 
 CONFIG = configparser.ConfigParser()
 CONFIG_SECTION = 'USER_DETAILS'
@@ -9,6 +11,7 @@ CONFIG_FILE = 'auth_config.cfg'
 AUTH =  {"client_id": None, "client_secret": None, "password": None, "user_agent": "not-another-reddit-dl", "username": None}
 REDDIT = None
 IMAGE_ENDINGS = [".png",".jpg",".jpeg",".gif"]
+POST_COUNT = 0
 
 def is_image(post):
 	url = post.url
@@ -51,10 +54,10 @@ def main():
 	directory = input("Directory to save to, defaults to cwd: ") or os.getcwd()
 	score_lim = intput("Lower score limit, defaults to 1: ",fallback=1)
 	sub = input("Take from subreddit /r/")
-	for post in REDDIT.subreddit(sub).new():
+	for post in REDDIT.subreddit(sub).top('all',limit=None):
 		if(post.score >= score_lim):
 		    if(is_image(post)):
-			    download(post.url,post.title,f"{directory}/{sub}")
+			    download(post.url,directory=f"{directory}/{sub}")
 
 def input_auth():
 	for field in AUTH:
