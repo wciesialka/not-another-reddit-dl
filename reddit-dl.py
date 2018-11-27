@@ -2,8 +2,7 @@ import praw
 import configparser
 import requests
 import os
-import pprint
-
+from tqdm import tqdm
 
 CONFIG = configparser.ConfigParser()
 CONFIG_SECTION = 'USER_DETAILS'
@@ -54,16 +53,16 @@ def download(url,filename=None,directory=None):
         raise
 
 def main():
-    direc = input("Directory to save to, defaults to cwd: ") or os.getcwd()
+    directory = input("Directory to save to, defaults to cwd: ") or os.getcwd()
     score_lim = intput("Lower score limit, defaults to 1: ",fallback=1)
     sub = input("Take from subreddit /r/")
     posts = REDDIT.subreddit(sub).top('all',limit=None)
     try:
-        for post in posts:
+        for post in tqdm(posts,desc=f"/r/{sub}",unit="posts"):
             if(post.score >= score_lim):
                 if(is_image(post)):
                     try:
-                        download(post.url,directory=direc)
+                        download(post.url,directory=f"{directory}/{sub}")
                     except:
                         print(f"Failed to download \'{post.title}\'")
     except:
